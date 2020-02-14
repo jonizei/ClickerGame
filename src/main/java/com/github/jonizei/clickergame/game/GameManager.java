@@ -26,11 +26,10 @@ public class GameManager {
         );
     }
 
-    public void click() {
+    public int click() {
         clickerCount++;
         System.out.println("Clicker count: " + clickerCount);
-        int reward = getReward(clickerCount);
-        System.out.println("Reward: " + reward);
+        return getReward(clickerCount);
     }
 
     public int getReward(int num) {

@@ -2,6 +2,7 @@ package com.github.jonizei.clickergame.security;
 
 import com.github.jonizei.clickergame.applicationuser.ApplicationUserService;
 import com.github.jonizei.clickergame.jwt.JwtLoginAuthenticationFilter;
+import com.github.jonizei.clickergame.jwt.JwtTokenVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,8 +40,9 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .cors()
                 .and()
                 .addFilter(new JwtLoginAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtTokenVerifier(), JwtLoginAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", "/api/click/*").permitAll()
+                .antMatchers("/", "/js/*", "/css/*").permitAll()
                 .anyRequest()
                 .authenticated();
 
