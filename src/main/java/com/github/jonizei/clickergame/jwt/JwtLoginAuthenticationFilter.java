@@ -71,6 +71,5 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find user with username %s", authResult.getName())));
 
         response.addHeader("Authorization", "Bearer " + token);
-        response.addIntHeader("Identification", applicationUser.getUserId());
     }
 }

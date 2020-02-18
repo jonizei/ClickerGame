@@ -5,7 +5,9 @@ import javafx.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class GameManager {
@@ -26,24 +28,39 @@ public class GameManager {
         );
     }
 
-    public int click() {
+    public Reward click() {
         clickerCount++;
-        System.out.println("Clicker count: " + clickerCount);
-        return getReward(clickerCount);
+        int rewardPoints = getReward(clickerCount);
+
+        if(rewardPoints > 0)
+            return new Reward(rewardPoints, getClicksToReward(clickerCount));
+        else
+            return new Reward(rewardPoints - 1, 0);
     }
 
     public int getReward(int num) {
 
-        int points = 0;
-        int highestKeyValue = 0;
-        for(Pair<Integer, Integer> step : rewardSteps) {
-            if(step.getKey() > highestKeyValue && (num % step.getKey()) == 0) {
-                highestKeyValue = step.getKey();
-                points = step.getValue();
-            }
-        }
+        Pair<Integer, Integer> pair = rewardSteps.stream()
+                .filter(step -> (num % step.getKey()) == 0)
+                .max(Comparator.comparing(Pair::getKey))
+                .orElse(null);
 
-        return points;
+        return (pair != null) ? pair.getValue() : 0;
+    }
+
+    public int getClicksToReward(int num) {
+
+        return rewardSteps.stream()
+                .mapToInt(step -> countClicks(num, step.getKey()))
+                .min().getAsInt();
+    }
+
+    private int countClicks(int n, int x) {
+        int i = n + 1;
+        while((i % x) != 0) {
+            i++;
+        }
+        return i - n;
     }
 
 }

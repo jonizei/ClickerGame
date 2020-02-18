@@ -26,12 +26,12 @@ public class GameController {
 
     @PreAuthorize("hasRole('ROLE_PLAYER')")
     @PostMapping("/click/{playerId}")
-    public ResponseEntity<Integer> buttonClick(@PathVariable int playerId) {
+    public ResponseEntity<Reward> buttonClick(@PathVariable int playerId) {
         ApplicationUser applicationUser = applicationUserRepository.findById(playerId)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find player with id %d", playerId)));
 
-        int reward = gameManager.click();
-        applicationUser.setPoints(applicationUser.getPoints() + reward - 1);
+        Reward reward = gameManager.click();
+        applicationUser.setPoints(applicationUser.getPoints() + reward.getPoints());
         applicationUserRepository.save(applicationUser);
 
         return new ResponseEntity<>(reward, HttpStatus.OK);
