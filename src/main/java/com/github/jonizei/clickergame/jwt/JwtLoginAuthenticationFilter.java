@@ -1,6 +1,8 @@
 package com.github.jonizei.clickergame.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.jonizei.clickergame.applicationuser.ApplicationUser;
+import com.github.jonizei.clickergame.applicationuser.ApplicationUserRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -17,14 +20,17 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.time.LocalDate;
+import java.util.Optional;
 
 public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
+    private final ApplicationUserRepository applicationUserRepository;
 
     @Autowired
-    public JwtLoginAuthenticationFilter(AuthenticationManager authenticationManager) {
+    public JwtLoginAuthenticationFilter(AuthenticationManager authenticationManager, ApplicationUserRepository applicationUserRepository) {
         this.authenticationManager = authenticationManager;
+        this.applicationUserRepository = applicationUserRepository;
     }
 
     @Override
@@ -61,6 +67,10 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .compact();
 
+        ApplicationUser applicationUser = applicationUserRepository.findByUsername(authResult.getName())
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find user with username %s", authResult.getName())));
+
         response.addHeader("Authorization", "Bearer " + token);
+        response.addIntHeader("Identification", applicationUser.getUserId());
     }
 }

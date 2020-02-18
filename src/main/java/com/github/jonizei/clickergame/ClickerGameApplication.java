@@ -33,7 +33,7 @@ public class ClickerGameApplication {
 						.allowedMethods("POST", "GET", "OPTIONS", "HEAD", "PUT", "PATCH")
 						.allowedHeaders("Authorization", "Content-Type", "Content-Length", "XSRF-TOKEN", "Credentials")
 						.allowedOrigins("https://localhost:3000", "http://localhost:3000")
-						.exposedHeaders("Authorization");
+						.exposedHeaders("Authorization", "Identification");
 			}
 		};
 	}

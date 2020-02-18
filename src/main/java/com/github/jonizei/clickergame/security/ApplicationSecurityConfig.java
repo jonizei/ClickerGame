@@ -1,5 +1,6 @@
 package com.github.jonizei.clickergame.security;
 
+import com.github.jonizei.clickergame.applicationuser.ApplicationUserRepository;
 import com.github.jonizei.clickergame.applicationuser.ApplicationUserService;
 import com.github.jonizei.clickergame.jwt.JwtLoginAuthenticationFilter;
 import com.github.jonizei.clickergame.jwt.JwtTokenVerifier;
@@ -22,11 +23,13 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final PasswordEncoder passwordEncoder;
     private final ApplicationUserService applicationUserService;
+    private final ApplicationUserRepository applicationUserRepository;
 
     @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService) {
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService, ApplicationUserRepository applicationUserRepository) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
+        this.applicationUserRepository = applicationUserRepository;
     }
 
     @Override
@@ -39,7 +42,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .cors()
                 .and()
-                .addFilter(new JwtLoginAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtLoginAuthenticationFilter(authenticationManager(), applicationUserRepository))
                 .addFilterAfter(new JwtTokenVerifier(), JwtLoginAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "/js/*", "/css/*").permitAll()
