@@ -1,11 +1,11 @@
 package com.github.jonizei.clickergame.jwt;
 
-public class LoginAuthenticationRequest {
+public class UsernameAndPasswordRequest {
 
     private String username;
     private String password;
 
-    public LoginAuthenticationRequest() {
+    public UsernameAndPasswordRequest() {
 
     }
 

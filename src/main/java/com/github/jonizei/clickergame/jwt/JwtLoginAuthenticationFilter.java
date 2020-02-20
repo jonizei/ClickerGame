@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Date;
 import java.time.LocalDate;
-import java.util.Optional;
 
 public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
@@ -38,8 +37,8 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
 
         try {
 
-            LoginAuthenticationRequest authenticationRequest = new ObjectMapper()
-                    .readValue(request.getInputStream(), LoginAuthenticationRequest.class);
+            UsernameAndPasswordRequest authenticationRequest = new ObjectMapper()
+                    .readValue(request.getInputStream(), UsernameAndPasswordRequest.class);
 
             Authentication authentication = new UsernamePasswordAuthenticationToken(
                     authenticationRequest.getUsername(),
