@@ -2,6 +2,7 @@ package com.github.jonizei.clickergame.applicationuser;
 
 import com.github.jonizei.clickergame.game.PlayerDetails;
 import com.github.jonizei.clickergame.jwt.UsernameAndPasswordRequest;
+import com.github.jonizei.clickergame.util.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -30,25 +31,19 @@ public class ApplicationUserController {
     @PostMapping("/details")
     public ResponseEntity<PlayerDetails> getPlayerDetails() {
 
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if(auth instanceof AnonymousAuthenticationToken) {
-            return new ResponseEntity<>(null, HttpStatus.FORBIDDEN);
-        }
-
-        final String usernameToBeFound = auth.getName();
+        final String usernameToBeFound = Utilities.getAuthentication().getName();
         ApplicationUser applicationUser = applicationUserRepository.findByUsername(usernameToBeFound)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find username: %s", usernameToBeFound)));
 
-        PlayerDetails playerDetails = new PlayerDetails();
-        playerDetails.setId(applicationUser.getUserId());
-        playerDetails.setUsername(applicationUser.getUsername());
-        playerDetails.setPoints(applicationUser.getPoints());
+        PlayerDetails playerDetails = new PlayerDetails(applicationUser.getUsername(), applicationUser.getPoints());
 
         return new ResponseEntity<>(playerDetails, HttpStatus.OK);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UsernameAndPasswordRequest request) {
+
+        String responseMsg = "Username is already taken";
 
         if(!applicationUserRepository.findByUsername(request.getUsername()).isPresent()) {
 
@@ -68,16 +63,16 @@ public class ApplicationUserController {
 
                     applicationUserRepository.save(newApplicationUser);
 
-                    return new ResponseEntity<>("User created successfully", HttpStatus.OK);
+                    responseMsg = "User created successfully";
                 }
-                else return new ResponseEntity<>("Password is too short", HttpStatus.OK);
+                else responseMsg = "Password is too short";
 
             }
-            else return new ResponseEntity<>("Username is too short", HttpStatus.OK);
+            else responseMsg = "Username is too short";
 
         }
 
-        return new ResponseEntity<>("Username is already taken", HttpStatus.OK);
+        return new ResponseEntity<>(responseMsg, HttpStatus.OK);
     }
 
 }

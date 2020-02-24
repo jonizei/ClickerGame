@@ -2,14 +2,16 @@ package com.github.jonizei.clickergame.game;
 
 import com.github.jonizei.clickergame.applicationuser.ApplicationUser;
 import com.github.jonizei.clickergame.applicationuser.ApplicationUserRepository;
+import com.github.jonizei.clickergame.util.Utilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
-
-import javax.xml.ws.Response;
 
 @RestController
 @RequestMapping("/api")
@@ -25,10 +27,12 @@ public class GameController {
     }
 
     @PreAuthorize("hasRole('ROLE_PLAYER')")
-    @PostMapping("/click/{playerId}")
-    public ResponseEntity<Reward> buttonClick(@PathVariable int playerId) {
-        ApplicationUser applicationUser = applicationUserRepository.findById(playerId)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find player with id %d", playerId)));
+    @PostMapping("/click")
+    public ResponseEntity<Reward> buttonClick() {
+
+        final String usernameToBeFound = Utilities.getAuthentication().getName();
+        ApplicationUser applicationUser = applicationUserRepository.findByUsername(usernameToBeFound)
+                .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find username: %s", usernameToBeFound)));
 
         Reward reward = gameManager.click();
         applicationUser.setPoints(applicationUser.getPoints() + reward.getPoints());

@@ -2,7 +2,6 @@ package com.github.jonizei.clickergame.game;
 
 public class PlayerDetails {
 
-    private int id;
     private String username;
     private int points;
 
@@ -10,12 +9,9 @@ public class PlayerDetails {
 
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+    public PlayerDetails(String username, int points) {
+        this.username = username;
+        this.points = points;
     }
 
     public String getUsername() {
