@@ -2,6 +2,7 @@ package com.github.jonizei.clickergame.security;
 
 import com.github.jonizei.clickergame.applicationuser.ApplicationUserRepository;
 import com.github.jonizei.clickergame.applicationuser.ApplicationUserService;
+import com.github.jonizei.clickergame.jwt.JwtConfig;
 import com.github.jonizei.clickergame.jwt.JwtLoginAuthenticationFilter;
 import com.github.jonizei.clickergame.jwt.JwtTokenVerifier;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import javax.crypto.SecretKey;
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -24,12 +27,20 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     private final PasswordEncoder passwordEncoder;
     private final ApplicationUserService applicationUserService;
     private final ApplicationUserRepository applicationUserRepository;
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
 
     @Autowired
-    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder, ApplicationUserService applicationUserService, ApplicationUserRepository applicationUserRepository) {
+    public ApplicationSecurityConfig(PasswordEncoder passwordEncoder,
+                                     ApplicationUserService applicationUserService,
+                                     ApplicationUserRepository applicationUserRepository,
+                                     JwtConfig jwtConfig,
+                                     SecretKey secretKey) {
         this.passwordEncoder = passwordEncoder;
         this.applicationUserService = applicationUserService;
         this.applicationUserRepository = applicationUserRepository;
+        this.jwtConfig = jwtConfig;
+        this.secretKey = secretKey;
     }
 
     @Override
@@ -42,8 +53,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .cors()
                 .and()
-                .addFilter(new JwtLoginAuthenticationFilter(authenticationManager(), applicationUserRepository))
-                .addFilterAfter(new JwtTokenVerifier(), JwtLoginAuthenticationFilter.class)
+                .addFilter(new JwtLoginAuthenticationFilter(authenticationManager(), applicationUserRepository, jwtConfig, secretKey))
+                .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtLoginAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "/js/*", "/css/*", "/api/user/register").permitAll()
                 .anyRequest()

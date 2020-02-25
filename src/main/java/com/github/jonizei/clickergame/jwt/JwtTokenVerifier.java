@@ -2,13 +2,13 @@ package com.github.jonizei.clickergame.jwt;
 
 import com.google.common.base.Strings;
 import io.jsonwebtoken.*;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -21,23 +21,30 @@ import java.util.stream.Collectors;
 
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
+
+    public JwtTokenVerifier(JwtConfig jwtConfig, SecretKey secretKey) {
+        this.jwtConfig = jwtConfig;
+        this.secretKey = secretKey;
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String authorizationHeader = request.getHeader("Authorization");
+        String authorizationHeader = request.getHeader(jwtConfig.getAuthorizationHeader());
 
-        if(Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith("Bearer ")) {
+        if(Strings.isNullOrEmpty(authorizationHeader) || !authorizationHeader.startsWith(jwtConfig.getTokenPrefix())) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authorizationHeader.replace("Bearer ", "");
-        String secretKey = "VerySecretKeyVerySecretKeyVerySecretKeyVerySecretKeyVerySecretKey";
+        String token = authorizationHeader.replace(jwtConfig.getTokenPrefix(), "");
 
         try {
 
             Jws<Claims> claimsJws = Jwts.parser()
-                    .setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                    .setSigningKey(secretKey)
                     .parseClaimsJws(token);
 
             Claims body = claimsJws.getBody();

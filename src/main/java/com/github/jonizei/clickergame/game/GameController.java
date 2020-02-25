@@ -28,7 +28,7 @@ public class GameController {
         this.utilities = utilities;
     }
 
-    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    @PreAuthorize("hasAuthority('player:play')")
     @PostMapping("/click")
     public ResponseEntity<Reward> buttonClick() {
 

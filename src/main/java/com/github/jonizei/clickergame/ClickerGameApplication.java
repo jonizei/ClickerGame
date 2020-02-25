@@ -32,7 +32,7 @@ public class ClickerGameApplication {
 				registry.addMapping("/**")
 						.allowedMethods("POST", "GET", "OPTIONS", "PUT", "PATCH")
 						.allowedHeaders("Authorization", "Content-Type", "Content-Length", "XSRF-TOKEN", "Credentials")
-						.allowedOrigins("https://localhost:3000", "http://localhost:3000")
+						.allowedOrigins("https://localhost:3000", "http://localhost:3000") // TODO: Add heroku url
 						.exposedHeaders("Authorization");
 			}
 		};

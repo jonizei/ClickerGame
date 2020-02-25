@@ -13,6 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.crypto.SecretKey;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,11 +26,17 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
 
     private final AuthenticationManager authenticationManager;
     private final ApplicationUserRepository applicationUserRepository;
+    private final JwtConfig jwtConfig;
+    private final SecretKey secretKey;
 
-    @Autowired
-    public JwtLoginAuthenticationFilter(AuthenticationManager authenticationManager, ApplicationUserRepository applicationUserRepository) {
+    public JwtLoginAuthenticationFilter(AuthenticationManager authenticationManager,
+                                        ApplicationUserRepository applicationUserRepository,
+                                        JwtConfig jwtConfig,
+                                        SecretKey secretKey) {
         this.authenticationManager = authenticationManager;
         this.applicationUserRepository = applicationUserRepository;
+        this.jwtConfig = jwtConfig;
+        this.secretKey = secretKey;
     }
 
     @Override
@@ -56,19 +63,14 @@ public class JwtLoginAuthenticationFilter extends UsernamePasswordAuthentication
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
-        String secretKey = "VerySecretKeyVerySecretKeyVerySecretKeyVerySecretKeyVerySecretKey";
-
         String token = Jwts.builder()
                 .setSubject(authResult.getName())
                 .claim("authorities", authResult.getAuthorities())
                 .setIssuedAt(new Date())
-                .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(10)))
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
+                .setExpiration(java.sql.Date.valueOf(LocalDate.now().plusDays(jwtConfig.getTokenExpirationAfterDays())))
+                .signWith(secretKey)
                 .compact();
 
-        ApplicationUser applicationUser = applicationUserRepository.findByUsername(authResult.getName())
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find user with username %s", authResult.getName())));
-
-        response.addHeader("Authorization", "Bearer " + token);
+        response.addHeader(jwtConfig.getAuthorizationHeader(), jwtConfig.getTokenPrefix() + token);
     }
 }
