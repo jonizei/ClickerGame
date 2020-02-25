@@ -38,20 +38,4 @@ public class ClickerGameApplication {
 		};
 	}
 
-	@Bean
-	public void addUsers() {
-		applicationUserRepository.save(
-				new ApplicationUser(
-					"Test",
-					passwordEncoder.encode("password"),
-					200,
-					ApplicationUserRole.PLAYER,
-					true,
-					true,
-					true,
-					true
-				)
-		);
-	}
-
 }

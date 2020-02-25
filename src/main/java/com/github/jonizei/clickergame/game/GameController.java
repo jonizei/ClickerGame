@@ -19,26 +19,40 @@ public class GameController {
 
     private final GameManager gameManager;
     private final ApplicationUserRepository applicationUserRepository;
+    private final Utilities utilities;
 
     @Autowired
-    public GameController(GameManager gameManager, ApplicationUserRepository applicationUserRepository) {
+    public GameController(GameManager gameManager, ApplicationUserRepository applicationUserRepository, Utilities utilities) {
         this.gameManager = gameManager;
         this.applicationUserRepository = applicationUserRepository;
+        this.utilities = utilities;
     }
 
     @PreAuthorize("hasRole('ROLE_PLAYER')")
     @PostMapping("/click")
     public ResponseEntity<Reward> buttonClick() {
 
-        final String usernameToBeFound = Utilities.getAuthentication().getName();
-        ApplicationUser applicationUser = applicationUserRepository.findByUsername(usernameToBeFound)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find username: %s", usernameToBeFound)));
+        ApplicationUser applicationUser = utilities.getCurrentUser();
 
         Reward reward = gameManager.click();
         applicationUser.setPoints(applicationUser.getPoints() + reward.getPoints());
         applicationUserRepository.save(applicationUser);
 
         return new ResponseEntity<>(reward, HttpStatus.OK);
+    }
+
+    @PreAuthorize("hasRole('ROLE_PLAYER')")
+    @PostMapping("/click/reset")
+    public ResponseEntity<PlayerDetails> resetPoints() {
+
+        ApplicationUser applicationUser = utilities.getCurrentUser();
+
+        PlayerDetails playerDetails = new PlayerDetails(applicationUser.getUsername(), 20);
+
+        applicationUser.setPoints(20);
+        applicationUserRepository.save(applicationUser);
+
+        return new ResponseEntity<>(playerDetails, HttpStatus.OK);
     }
 
 }

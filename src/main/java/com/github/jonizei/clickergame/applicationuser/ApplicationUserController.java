@@ -20,21 +20,20 @@ public class ApplicationUserController {
 
     private final ApplicationUserRepository applicationUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final Utilities utilities;
 
     @Autowired
-    public ApplicationUserController(ApplicationUserRepository applicationUserRepository, PasswordEncoder passwordEncoder) {
+    public ApplicationUserController(ApplicationUserRepository applicationUserRepository, PasswordEncoder passwordEncoder, Utilities utilities) {
         this.applicationUserRepository = applicationUserRepository;
         this.passwordEncoder = passwordEncoder;
+        this.utilities = utilities;
     }
 
     @PreAuthorize("hasRole('ROLE_PLAYER')")
     @PostMapping("/details")
     public ResponseEntity<PlayerDetails> getPlayerDetails() {
 
-        final String usernameToBeFound = Utilities.getAuthentication().getName();
-        ApplicationUser applicationUser = applicationUserRepository.findByUsername(usernameToBeFound)
-                .orElseThrow(() -> new UsernameNotFoundException(String.format("Unable to find username: %s", usernameToBeFound)));
-
+        ApplicationUser applicationUser = utilities.getCurrentUser();
         PlayerDetails playerDetails = new PlayerDetails(applicationUser.getUsername(), applicationUser.getPoints());
 
         return new ResponseEntity<>(playerDetails, HttpStatus.OK);
