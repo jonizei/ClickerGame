@@ -1,7 +1,6 @@
 package com.github.jonizei.clickergame.game;
 
 import com.google.common.collect.Lists;
-import javafx.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
