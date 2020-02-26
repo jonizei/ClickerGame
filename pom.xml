@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.github.jonizei</groupId>
 	<artifactId>clickergame</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0</version>
 	<name>clickergame</name>
 	<description>Multiplayer clicker game</description>
 
@@ -33,7 +33,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
+			<scope>9.4-1201-jdbc4</scope>
 		</dependency>
 
 		<dependency>
