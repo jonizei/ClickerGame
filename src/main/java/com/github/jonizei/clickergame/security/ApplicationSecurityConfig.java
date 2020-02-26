@@ -53,7 +53,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .cors()
                 .and()
-                .addFilter(new JwtLoginAuthenticationFilter(authenticationManager(), applicationUserRepository, jwtConfig, secretKey))
+                .addFilter(new JwtLoginAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtLoginAuthenticationFilter.class)
                 .authorizeRequests()
                 .antMatchers("/", "/js/*", "/css/*", "/api/user/register").permitAll()

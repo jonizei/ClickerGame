@@ -19,16 +19,50 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * This class will filter every client request and it will verify
+ * the jwt token sent from a client
+ *
+ * @author Joni Koskinen
+ * @version 2020-02-26
+ */
 public class JwtTokenVerifier extends OncePerRequestFilter {
 
+    /**
+     * Class that holds information for a jwt token
+     */
     private final JwtConfig jwtConfig;
+
+    /**
+     * SecretKey for a jwt token
+     */
     private final SecretKey secretKey;
 
+    /**
+     * Constructor of JwtTokenVerifier
+     *
+     * @param jwtConfig Class that holds information for a jwt token
+     * @param secretKey SecretKey for a jwt token
+     */
     public JwtTokenVerifier(JwtConfig jwtConfig, SecretKey secretKey) {
         this.jwtConfig = jwtConfig;
         this.secretKey = secretKey;
     }
 
+    /**
+     * This method will take authorization header from a client request and
+     * then it will parse the jwt token and check if is valid.
+     *
+     * If the jwt token is valid it will set the authentication.
+     *
+     * After that it will continue the filter chain
+     *
+     * @param request HttpServletRequest from a client
+     * @param response HttpServletResponse from a client
+     * @param filterChain FilterChain object which holds all filters used in an application
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
