@@ -98,7 +98,7 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .addFilter(new JwtLoginAuthenticationFilter(authenticationManager(), jwtConfig, secretKey))
                 .addFilterAfter(new JwtTokenVerifier(jwtConfig, secretKey), JwtLoginAuthenticationFilter.class)
                 .authorizeRequests()
-                .antMatchers("/", "/static/**").permitAll()
+                .antMatchers("/", "/static/**", "/api/user/register").permitAll()
                 .anyRequest()
                 .authenticated();
 
