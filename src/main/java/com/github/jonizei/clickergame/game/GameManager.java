@@ -77,9 +77,9 @@ public class GameManager {
         int rewardPoints = getReward(clickerCount);
 
         if(rewardPoints > 0)
-            return new Reward(rewardPoints - 1, getClicksToReward(clickerCount));
+            return new Reward(rewardPoints, getClicksToReward(clickerCount));
         else
-            return new Reward(rewardPoints - 1, 0);
+            return new Reward(rewardPoints, 0);
     }
 
     /**

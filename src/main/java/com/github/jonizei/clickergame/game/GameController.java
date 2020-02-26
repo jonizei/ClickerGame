@@ -70,7 +70,7 @@ public class GameController {
         ApplicationUser applicationUser = utilities.getCurrentUser();
 
         Reward reward = gameManager.click();
-        applicationUser.setPoints(applicationUser.getPoints() + reward.getPoints());
+        applicationUser.setPoints(applicationUser.getPoints() - 1 + reward.getPoints());
         applicationUserRepository.save(applicationUser);
 
         return new ResponseEntity<>(reward, HttpStatus.OK);

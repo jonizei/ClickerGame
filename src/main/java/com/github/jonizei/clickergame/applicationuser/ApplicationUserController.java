@@ -50,7 +50,7 @@ public class ApplicationUserController {
     }
 
     /**
-     * Handles POST requests to "/api/user/details" url
+     * Handles GET requests to "/api/user/details" url
      *
      * Requires role "ROLE_PLAYER"
      *
@@ -61,7 +61,7 @@ public class ApplicationUserController {
      * @return ResponseEntity with PlayerDetails and HttpStatus.OK
      */
     @PreAuthorize("hasRole('ROLE_PLAYER')")
-    @PostMapping("/details")
+    @GetMapping("/details")
     public ResponseEntity<PlayerDetails> getPlayerDetails() {
 
         ApplicationUser applicationUser = utilities.getCurrentUser();
