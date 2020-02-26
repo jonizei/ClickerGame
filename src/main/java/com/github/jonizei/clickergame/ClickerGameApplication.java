@@ -11,19 +11,31 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+/**
+ * Launcher of the application
+ *
+ * @author Joni Koskinen
+ * @version 2020-26
+ */
 @SpringBootApplication
 public class ClickerGameApplication {
 
-	@Autowired
-	ApplicationUserRepository applicationUserRepository;
-
-	@Autowired
-	PasswordEncoder passwordEncoder;
-
+	/**
+	 * This methods launces the application by creating new instance
+	 * of ClickerGameApplication
+	 *
+	 * @param args Arguments from command prompt
+	 */
 	public static void main(String[] args) {
 		SpringApplication.run(ClickerGameApplication.class, args);
 	}
 
+	/**
+	 * Configures which methods, headers and origins are allowed
+	 * in this application
+	 *
+	 * @return WebMvcConfigurer object
+	 */
 	@Bean
 	public WebMvcConfigurer corsConfigurer() {
 		return new WebMvcConfigurer() {
